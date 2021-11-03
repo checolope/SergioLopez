@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <link rel="stylesheet" href="sweetalert2.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <v-app>
+        <v-app id="inspire">
+          <v-navigation-drawer
+            v-model="drawer"
+            app
+          >
+          <v-row justify="center">
+            <v-date-picker v-model="picker"></v-date-picker>
+          </v-row>
+          
+            <!--  -->
+          </v-navigation-drawer>
+
+          <v-app-bar  color="green" app>
+            
+            <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+
+            <v-toolbar-title>Application web</v-toolbar-title>
+          </v-app-bar>
+
+          <v-main>
+            <!-- curpo de la aplicacion web -->
+            <br>
+            <div class="text-aling">
+                <v-menu transition="fab-transition">
+                  <template v-slot:activator="{ on, attrs }">&nbsp;
+                    <v-btn
+                      dark
+                      color="primary"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Fab Transition
+                    </v-btn>
+                  </template>
+                  <v-list>
+                    <v-list-item
+                      v-for="n in 3 "
+                      :key="n"
+                      link
+                    >
+                      <v-list-item-title v-text="'Item ' + n"></v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </div><br>
+              <!-- otro parte de agregacion de estilos -->
+               <v-container style="max-width: 500px">
+                <v-text-field
+                  v-model="newTask"
+                  label="¿En que estas  trabajando?"
+                  solo
+                  @keydown.enter="create"
+                >
+                  <template v-slot:append>
+                    <v-fade-transition>
+                      <v-icon
+                        v-if="newTask"
+                        @click="create"
+                      >
+                        Preciona un enter
+                      </v-icon>
+                    </v-fade-transition>
+                  </template>
+                </v-text-field>
+
+                <h2 class="display-1 success--text pl-4">
+                  Tasks:&nbsp;
+                  <v-fade-transition leave-absolute>
+                    <span :key="`tasks-${tasks.length}`">
+                      {{ tasks.length }}
+                    </span>
+                  </v-fade-transition>
+                </h2>
+
+                <v-divider class="mt-4"></v-divider>
+
+                <v-row
+                  class="my-1"
+                  align="center"
+                >
+                  <strong class="mx-4 info--text text--darken-2">
+                    Remaining: {{ remainingTasks }}
+                  </strong>
+
+                  <v-divider vertical></v-divider>
+
+                  <strong class="mx-4 success--text text--darken-2">
+                    Completed: {{ completedTasks }}
+                  </strong>
+
+                  <v-spacer></v-spacer>
+
+                  <v-progress-circular
+                    :value="progress"
+                    class="mr-2"
+                  ></v-progress-circular>
+                </v-row>
+
+                <v-divider class="mb-4"></v-divider>
+
+                <v-card v-if="tasks.length > 0">
+                  <v-slide-y-transition
+                    class="py-0"
+                    group
+                    tag="v-list"
+                  >
+                    <template v-for="(task, i) in tasks">
+                      <v-divider
+                        v-if="i !== 0"
+                        :key="`${i}-divider`"
+                      ></v-divider>
+
+                      <v-list-item :key="`${i}-${task.text}`">
+                        <v-list-item-action>
+                          <v-checkbox
+                            v-model="task.done"
+                            :color="task.done && 'grey' || 'primary'"
+                          >
+                            <template v-slot:label>
+                              <div
+                                :class="task.done && 'grey--text' || 'primary--text'"
+                                class="ml-4"
+                                v-text="task.text"
+                              ></div>
+                            </template>
+                          </v-checkbox>
+                        </v-list-item-action>
+
+                        <v-spacer></v-spacer>
+
+                        <v-scroll-x-transition>
+                          <v-icon
+                            v-if="task.done"
+                            color="success">
+                            mdi-check
+                          </v-icon>
+                        </v-scroll-x-transition>
+                      </v-list-item>
+                    </template>
+                  </v-slide-y-transition>
+                </v-card>
+              </v-container>
+              <!-- iniciar los  cuadros de paginas-->
+               <v-container>
+                <v-row justify="center">
+                  <v-col
+                    v-for="n in 8"
+                    :key="n"
+                    cols="auto">
+                    <v-card
+                      :elevation="n - 1"
+                      height="100"
+                      width="100"
+                      class="secondary">
+                      <v-row
+                        class="fill-height"
+                        align="center"
+                        justify="center"
+                        v-text="n - 1">
+                      </v-row>
+                    </v-card>
+                  </v-col>
+                </v-row>
+                <div class="text-center">
+                  <v-btn
+                    dark
+                    color="orange darken-2"
+                    @click="snackbar = true"
+                  >
+                    Open Snackbar
+                  </v-btn>
+
+                  <v-snackbar
+                    v-model="snackbar"
+                    :timeout="timeout"
+                  >
+                    {{ text }}
+
+                    <template v-slot:action="{ attrs }">
+                      <v-btn
+                        color="blue"
+                        text
+                        v-bind="attrs"
+                        @click="snackbar = false"
+                      >
+                        Close
+                      </v-btn>
+                    </template>
+                  </v-snackbar>
+                </div>
+              </v-container>
+          </v-main>
+          <v-footer
+          dark
+          padless
+        >
+          <v-card
+            class="flex"
+            flat
+            tile
+          >
+            <v-card-title class="teal">
+              <v-spacer>
+                 <div class="text-center">
+                  <v-pagination
+                    v-model="page"
+                    :length="4"
+                    circle
+                  ></v-pagination>
+                </div>
+              </v-spacer>
+
+              <v-btn
+                v-for="icon in icons"
+                :key="icon"
+                class="mx-4"
+                dark
+                icon
+              >
+                <v-icon size="24px">
+                  {{ icon }}
+                </v-icon>
+              </v-btn>
+            </v-card-title>
+
+            <v-card-text class="py-2 white--text text-center">
+              {{ new Date().getFullYear() }} — <strong>Vuetify</strong>
+            </v-card-text>
+          </v-card>
+        </v-footer>
+      </v-app>
+    </v-app>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+  <script src="sweetalert2.all.min.js"></script>
+    <!-- Optional: include a polyfill for ES6 Promises for IE11 -->
+  <script src="//cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.js"></script>
+  <script src="sweetalert2.min.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data: () => ({
+        icons: 0,
+        picker: new Date().toISOString().substr(0, 10),
+        drawer: null,
+        page: 1,
+        snackbar: false,
+        text: 'My timeout is set to 2000.',
+        timeout: 2000,
+        tasks: [
+          ///
+        ],
+        newTask: null,
+      }),
+
+      computed: {
+        completedTasks () {
+          return this.tasks.filter(task => task.done).length
+        },
+        progress () {
+          return this.completedTasks / this.tasks.length * 100
+        },
+        remainingTasks () {
+          return this.tasks.length - this.completedTasks
+        },
+      },
+
+      methods: {
+        create () {
+          this.tasks.push({
+            done: false,
+            text: this.newTask,
+          })
+
+          this.newTask = null
+        },
+      },
+    })
+  </script>
+</body>
+</html>
